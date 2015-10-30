@@ -8,17 +8,22 @@
     "init":""
 }
 #end
+$brainfuck ;; Interprets !-terminated brainfuck program passed through console
 @brainfuck_endless_loop
-call $brainfuck
+push 30000 ;; basic space between memory and program
+push 0     ;; basic program location
+call $brainfuck_load_console
+call $brainfuck_interpret
 jmp @brainfuck_endless_loop
 halt 0
-$brainfuck ;; Interprets !-terminated brainfuck program, read from console,  
-var cmd ;; current command
-var ptr ;; memory pointer
+$brainfuck_load_console ;; Loads !-terminated brainfuck program from console, into memory
+var ptr ;; memory pointer  (offset)
 var pp  ;; program pointer (counter)
-var lss ;; loop stack size (for not popping empty stack)
-mov pp 0
+pop pp
+pop ptr
+var cmd ;; current command
 var tmp 
+mov tmp pp
 @brainfuck_store_loop ;; store program in RAM
 in cmd conio_charPort
 store pp cmd
@@ -28,9 +33,21 @@ jnz cmd @brainfuck_store_loop
 store pp 0  ;; create some space between program and data
 add pp pp 1
 store pp 0
-add ptr pp 1
-add ptr ptr 30000 ;; Some more space
-mov pp 0 ;; reset program pointer
+add pp pp 1
+add ptr ptr pp
+;add ptr ptr 30000 ;; Some more space
+mov pp tmp ;; reset program pointer
+push ptr   ;; true memory pointer
+push pp    ;; true program pointer
+ret
+$brainfuck_interpret ;; Interprets 0-terminated brainfuck program, from memory
+var ptr ;; memory pointer
+var pp  ;; program pointer (counter)
+pop pp
+pop ptr
+var cmd ;; current command
+var tmp
+var lss ;; loop stack size
 @brainfuck_loop ;; while cmd != 0
 load cmd pp
 sub tmp cmd '>'
