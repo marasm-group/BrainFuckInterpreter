@@ -1,0 +1,110 @@
+;
+; BrainFuck interpreter
+;
+#json
+{
+    "author":"SR3u",    
+    "dependencies":["conio"],
+    "init":""
+}
+#end
+@brainfuck_endless_loop
+call $brainfuck
+jmp @brainfuck_endless_loop
+halt 0
+$brainfuck ;; Interprets !-terminated brainfuck program, read from console,  
+var cmd ;; current command
+var ptr ;; memory pointer
+var pp  ;; program pointer (counter)
+var lss ;; loop stack size (for not popping empty stack)
+mov pp 0
+var tmp 
+@brainfuck_store_loop ;; store program in RAM
+in cmd conio_charPort
+store pp cmd
+add pp pp 1
+sub cmd cmd '!'
+jnz cmd @brainfuck_store_loop
+store pp 0  ;; create some space between program and data
+add pp pp 1
+store pp 0
+add ptr pp 1
+add ptr ptr 30000 ;; Some more space
+mov pp 0 ;; reset program pointer
+@brainfuck_loop ;; while cmd != 0
+load cmd pp
+sub tmp cmd '>'
+jnz tmp @brainfuck_0
+add ptr ptr 1
+jmp @brainfuck_iter
+@brainfuck_0
+sub tmp cmd '<'
+jnz tmp @brainfuck_1
+sub ptr ptr 1
+jmp @brainfuck_iter
+@brainfuck_1
+sub tmp cmd '+'
+jnz tmp @brainfuck_2
+load tmp ptr
+add tmp tmp 1
+store ptr tmp
+jmp @brainfuck_iter
+@brainfuck_2
+sub tmp cmd '-'
+jnz tmp @brainfuck_3
+load tmp ptr
+sub tmp tmp 1
+store ptr tmp
+jmp @brainfuck_iter
+@brainfuck_3
+sub tmp cmd '.'
+jnz tmp @brainfuck_4
+load tmp ptr
+out conio_charPort tmp
+jmp @brainfuck_iter
+@brainfuck_4
+sub tmp cmd ','
+jnz tmp @brainfuck_5
+in tmp conio_charPort
+store ptr tmp
+jmp @brainfuck_iter
+@brainfuck_5
+sub tmp cmd '['
+jnz tmp @brainfuck_6
+load tmp ptr
+jz tmp @brainfuck_while_noloop
+jlz tmp @brainfuck_while_noloop
+push pp
+add lss lss 1
+jmp @brainfuck_iter
+@brainfuck_while_noloop
+var tp  ;; temporary program pointer
+mov tp pp
+@brainfuck_while
+add tp tp 1
+load tmp tp
+sub tmp tmp ']'
+jnz tmp @brainfuck_while
+mov pp tp
+delv tp
+jmp @brainfuck_iter
+@brainfuck_6
+sub tmp cmd ']'
+jnz tmp @brainfuck_7
+jz lss @brainfuck_iter
+pop pp
+sub pp pp 1
+sub lss lss 1
+jmp @brainfuck_iter
+@brainfuck_7
+@brainfuck_iter
+add pp pp 1
+jnz cmd @brainfuck_loop
+out conio_charPort '\n' ;; print program end message
+out conio_charPort 'E'
+out conio_charPort 'N'
+out conio_charPort 'D'
+out conio_charPort '.'
+out conio_charPort '\n'
+ret
+halt -1 ;; prevent further execution (if any)
