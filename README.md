@@ -22,7 +22,18 @@ mvm brainfuck.marasm
 remember, that it will run program only when it finds the exclamation mark (!) symbol.
 
 2) Builtin (embedded in your program)
-Not currently available
+  1. (optional) copy brainfuck into modules
+  2. add it to your program header ("dependencies" section)
+  3. store brainfuck program somewhere in memory
+  4. write some code:
+  
+  ```
+  push <desired memory address>    ;; setup brainfuck starting memory address
+  push <brainfuck program address> ;; setup brainfuck program address
+  call $brainfuck_interpret        ;; call the interpreter function
+  ```
+  5. ?????
+  6. PROFIT
 
 ## Lisence ##
 
