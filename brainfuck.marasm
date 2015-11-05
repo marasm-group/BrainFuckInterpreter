@@ -14,6 +14,12 @@ push 30000 ;; basic space between memory and program
 push 0     ;; basic program location
 call $brainfuck_load_console
 call $brainfuck_interpret
+out conio_charPort '\n' ;; print program end message
+out conio_charPort 'E'
+out conio_charPort 'N'
+out conio_charPort 'D'
+out conio_charPort '.'
+out conio_charPort '\n'
 jmp @brainfuck_endless_loop
 halt 0
 $brainfuck_load_console ;; Loads !-terminated brainfuck program from console, into memory
@@ -117,11 +123,5 @@ jmp @brainfuck_iter
 @brainfuck_iter
 add pp pp 1
 jnz cmd @brainfuck_loop
-out conio_charPort '\n' ;; print program end message
-out conio_charPort 'E'
-out conio_charPort 'N'
-out conio_charPort 'D'
-out conio_charPort '.'
-out conio_charPort '\n'
 ret
 halt -1 ;; prevent further execution (if any)
